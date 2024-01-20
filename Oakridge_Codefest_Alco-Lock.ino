@@ -1,4 +1,5 @@
 #define carspeed 100
+#define turningcarspeed 150
 #define ENA 5
 #define ENB 6
 #define M1 7
@@ -32,24 +33,24 @@ void foward(){
  Serial.println("foward");
  analogWrite(ENA,carspeed);
  analogWrite(ENB,carspeed);
- digitalWrite(M1,LOW);
- digitalWrite(M2,HIGH);
- digitalWrite(M3,HIGH);
- digitalWrite(M4,LOW);
-}
-void back(){
- Serial.println("back");
- analogWrite(ENA,carspeed);
- analogWrite(ENB,carspeed);
  digitalWrite(M1,HIGH);
  digitalWrite(M2,LOW);
  digitalWrite(M3,LOW);
  digitalWrite(M4,HIGH);
 }
-void left(){
- Serial.println("foward");
+void back(){
+ Serial.println("back");
  analogWrite(ENA,carspeed);
  analogWrite(ENB,carspeed);
+ digitalWrite(M1,LOW);
+ digitalWrite(M2,HIGH);
+ digitalWrite(M3,HIGH);
+ digitalWrite(M4,LOW);
+}
+void left(){
+ Serial.println("foward");
+ analogWrite(ENA,turningcarspeed);
+ analogWrite(ENB,turningcarspeed);
  digitalWrite(M1,HIGH);
  digitalWrite(M2,LOW);
  digitalWrite(M3,HIGH);
@@ -57,8 +58,8 @@ void left(){
 }
 void right(){
  Serial.println("back");
- analogWrite(ENA,carspeed);
- analogWrite(ENB,carspeed);
+ analogWrite(ENA,turningcarspeed);
+ analogWrite(ENB,turningcarspeed);
  digitalWrite(M1,LOW);
  digitalWrite(M2,HIGH);
  digitalWrite(M3,LOW);
@@ -77,7 +78,14 @@ if (pol>=275){
   if(IR_M==LOW){
     foward();
   }
-
+  else if (IR_R==LOW){
+    right();
+    while(IR_R);
+  }
+  else if (IR_L==LOW){
+    left();
+    while(IR_L);
+  }
   
 }
-}
+ }
