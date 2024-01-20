@@ -1,5 +1,6 @@
-#define carspeed 100
-#define turningcarspeed 150
+#include <IRremote.h>
+#define carspeed 100 // speed for moving forward/back
+#define turningcarspeed 150 // speed for moving left/right 
 #define ENA 5
 #define ENB 6
 #define M1 7
@@ -14,7 +15,7 @@ int Trig = A5;
 int middleDistance = 0;
 
 void setup() {
-  // put your setup code here, to run once:
+
  pinMode(Echo,INPUT);
  pinMode(Trig,OUTPUT);
  pinMode(10,INPUT);
@@ -57,7 +58,7 @@ void back(){//function for going backwards
  digitalWrite(M4,LOW);
 }
 void left(){//function for going left
- Serial.println("foward");
+ Serial.println("left");
  analogWrite(ENA,turningcarspeed);
  analogWrite(ENB,turningcarspeed);
  digitalWrite(M1,HIGH);
@@ -66,7 +67,7 @@ void left(){//function for going left
  digitalWrite(M4,LOW);
 }
 void right(){//function for going right
- Serial.println("back");
+ Serial.println("right");
  analogWrite(ENA,turningcarspeed);
  analogWrite(ENB,turningcarspeed);
  digitalWrite(M1,LOW);
@@ -84,23 +85,24 @@ void loop() {
  int pol=analogRead(A0);//pollutuion sensor
  Serial.println(pol);
  if (pol>=275){
-  if(IR_M==LOW){ //IR Sensor following line 
+  if(IR_M==HIGH&&IR_R==HIGH&&IR_L==HIGH){ //IR Sensor following line 
     foward();
   }
-  else if (IR_R==LOW){
-    right();
-    while(IR_R);
-  }
-  else if (IR_L==LOW){
+  else if (IR_R==LOW&&IR_L==HIGH&&IR_M==LOW){
     left();
-    while(IR_L);
+    delay(200);
   }
-  if (Distance_test<=40){
+  else if (IR_R==HIGH&&IR_L==LOW&&IR_M==HIGH){
+    right();
+    delay(200);
+  }
+  if (Distance_test<=40){//Ultrasonic sensor detecting objects
     foward();
   
   }
   else{
     stop();
   }
+}
 }
  
