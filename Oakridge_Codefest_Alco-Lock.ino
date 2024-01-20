@@ -1,6 +1,4 @@
 #include <IRremote.h>
-#include <Servo.h>
-Servo myservo;
 IRrecv IR(3);
 #define carspeed 100 // speed for moving forward/back
 #define turningcarspeed 150 // speed for moving left/right 
@@ -15,7 +13,7 @@ IRrecv IR(3);
 #define IR_L !digitalRead(2)
 int Echo = A4;  
 int Trig = A5; 
-int middleDistance = 0;
+long duration, inches;
 
 void setup() {
  IR.enableIRIn();
@@ -34,13 +32,12 @@ void setup() {
 }
 int Distance_test() {
   digitalWrite(Trig, LOW);   
-  delayMicroseconds(2);
+  delayMicroseconds(5);
   digitalWrite(Trig, HIGH);  
-  delayMicroseconds(2);
+  delayMicroseconds(10);
   digitalWrite(Trig, LOW);   
-  float Fdistance = pulseIn(Echo, HIGH);  
-  Fdistance= Fdistance / 58;       
-  return (int)Fdistance;
+  duration = pulseIn(Echo, HIGH);  
+  inches = (duration/2) / 74; 
 }
 void foward(){//function for going forwards
  Serial.println("foward");
@@ -89,36 +86,41 @@ void stop(){//function for stopping
   
 }
 void loop() {
-  // put your main code here, to run repeatedly:
- myservo.write(90);
- delay(100);
+  Serial.println(inches);
+  Serial.println("inches");
+  delay(100);
+
  int pol=analogRead(A0);//pollutuion sensor
  Serial.println(pol);
  delay(100);
  if (pol>=275){
   if (Distance_test<=40){//Ultrasonic sensor detecting objects
     stop();
-    if(IR_M==1&&IR_R==1&&IR_L==1){ //IR Sensor following line 
-     foward();
-  }
-    else if (IR_R==0&&IR_L==1&&IR_M==0){
-     left();
-     delay(200);
-  }
-    else if (IR_R==1&&IR_L==0&&IR_M==1){
-     right();
-     delay(200);
-  }
-    else if (IR_R==0&&IR_L==0&&IR_M==0){
-     stop();
-     delay(200);
-  }
   }
   else{
     foward();
   }
+  if(IR_M==HIGH){
+    foward();
+  }
+  else if(IR_R==LOW) { 
+    left();
+    while(IR_R);                             
+  }   
+  else if(IR_L==LOW) {
+    right();
+    while(IR_L);  
+  }
+  Serial.println((int)Distance_test);
+  if (Distance_test<=70){//Ultrasonic sensor detecting objects
+    stop();
+  }
+  else{
+    foward();
+  }
+  }
+
   
-  
-}
+
 }
  
