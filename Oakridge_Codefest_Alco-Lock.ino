@@ -1,6 +1,6 @@
 #include <IRremote.h>
 IRrecv IR(12);
-#define carspeed 100 // speed for moving forward/back
+#define carspeed 125 // speed for moving forward/back
 #define turningcarspeed 150 // speed for moving left/right 
 #define stopcarspeed 0
 #define ENA 5
@@ -82,6 +82,24 @@ void stop(){//function for stopping
   Serial.println("Stop");
   
 }
+void stpright(){
+  digitalWrite(ENA,turningcarspeed);
+  digitalWrite(ENB,turningcarspeed);
+  digitalWrite(M1,HIGH);
+  digitalWrite(M2,LOW);
+  digitalWrite(M3,LOW);
+  digitalWrite(M4,LOW);
+  Serial.println("StpRight");
+}
+void stpleft(){
+  digitalWrite(ENA,turningcarspeed);
+  digitalWrite(ENB,turningcarspeed);
+  digitalWrite(M1,LOW);
+  digitalWrite(M2,LOW);
+  digitalWrite(M3,LOW);
+  digitalWrite(M4,HIGH);
+  Serial.println("Stpleft");
+}
 void loop() {
   digitalWrite(Trig, LOW);   
   delayMicroseconds(5);
@@ -105,30 +123,30 @@ void loop() {
     else{
       foward();
     }
- 
+
   }
  else if (pol<275){
   if (IR.decode()){
     Serial.println(IR.decodedIRData.decodedRawData, HEX);
-    if(IR.decodedIRData.decodedRawData == 0xBB44FD02){
+    if(IR.decodedIRData.decodedRawData == 0xB649FD02){
       stop();
-      delay(500);
+      delay(50);
     }
-    if(IR.decodedIRData.decodedRawData == 0xB748FD02){
+    if(IR.decodedIRData.decodedRawData == 0xA25DFD02){
       foward();
-      delay(500);
+      delay(50);
     }
-    if(IR.decodedIRData.decodedRawData==0xBF40FD02){
+    if(IR.decodedIRData.decodedRawData==0xA659FD02){
       back();
-      delay(500);
+      delay(50);
     }
-    if(IR.decodedIRData.decodedRawData == 0xFB04FD02){
-      right();
-      delay(500);
+    if(IR.decodedIRData.decodedRawData == 0xF50AFD02){
+      stpleft();
+      delay(50);
     }
-    if(IR.decodedIRData.decodedRawData == 0xB847FD02){
-      left();
-      delay(500);
+    if(IR.decodedIRData.decodedRawData == 0xB54AFD02){
+      stpright();
+      delay(50);
     }
     delay(1500);
     IR.resume();
