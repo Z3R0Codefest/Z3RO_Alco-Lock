@@ -123,8 +123,20 @@ void loop() {
     else{
       foward();
     }
+    if(IR_M){
+    foward();
+    }
+    else if(IR_R) { 
+    stpright();
+    while(IR_R);
+    }
+    else if(IR_L) {
+    stpleft();
+    while(IR_L);
+    }
+}
 
-  }
+  
  else if (pol<275){
   if (IR.decode()){
     Serial.println(IR.decodedIRData.decodedRawData, HEX);
