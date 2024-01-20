@@ -1,5 +1,5 @@
 #include <IRremote.h>
-IRrecv IR(3);
+IRrecv IR(12);
 #define carspeed 100 // speed for moving forward/back
 #define turningcarspeed 150 // speed for moving left/right 
 #define stopcarspeed 0
@@ -9,20 +9,20 @@ IRrecv IR(3);
 #define M2 8
 #define M3 9
 #define M4 11
-#define IR_R !digitalRead(10)
-#define IR_M !digitalRead(4)
-#define IR_L !digitalRead(2)
-int Echo = A4;  
-int Trig = A5; 
-long duration, inches;
+#define IR_R !digitalRead(10) //IR right Sensor
+#define IR_M !digitalRead(4) //IR middle Sensor
+#define IR_L !digitalRead(2) //IR left Sensor
+int Echo = A4;  // reciever for Ultrasonic 
+int Trig = A5; //trigger for Ultrasonic
+long duration, inches; // Used to define & store variables
 
 void setup() {
  IR.enableIRIn();
  pinMode(Echo,INPUT);
  pinMode(Trig,OUTPUT);
- pinMode(10,INPUT);
- pinMode(4,INPUT);
- pinMode(2,INPUT);
+ pinMode(10,INPUT);//IR sensor right
+ pinMode(4,INPUT);//IR sensor middle
+ pinMode(2,INPUT);//IR sensor left
  pinMode(M1,OUTPUT);
  pinMode(M2,OUTPUT);
  pinMode(M3,OUTPUT);
@@ -88,20 +88,50 @@ void loop() {
   digitalWrite(Trig, HIGH);  
   delayMicroseconds(10);
   digitalWrite(Trig, LOW);   
-  duration = pulseIn(Echo, HIGH);  
+  duration = pulseIn(Echo, HIGH);  //used to read ultrasonic value 
   inches = (duration/2) / 74; 
   Serial.print("inches ");
-  Serial.println(inches);
+  Serial. println(inches);
   delay(500);
 
  int pol=analogRead(A0);//pollutuion sensor
  Serial.print("Pollution ");
- Serial.println(pol);
+ Serial. println(pol);
  delay(100);
- if (pol>=275 && inches<=7){
-    stop();
+ if (pol>=275){
+    if(inches<=7){
+      stop();
+    }
+    else{
+      foward();
+    }
+ 
   }
- else {
-  foward();
+ else if (pol<275){
+  if (IR.decode()){
+    Serial.println(IR.decodedIRData.decodedRawData, HEX);
+    if(IR.decodedIRData.decodedRawData == 0xBB44FD02){
+      stop();
+      delay(500);
+    }
+    if(IR.decodedIRData.decodedRawData == 0xB748FD02){
+      foward();
+      delay(500);
+    }
+    if(IR.decodedIRData.decodedRawData==0xBF40FD02){
+      back();
+      delay(500);
+    }
+    if(IR.decodedIRData.decodedRawData == 0xFB04FD02){
+      right();
+      delay(500);
+    }
+    if(IR.decodedIRData.decodedRawData == 0xB847FD02){
+      left();
+      delay(500);
+    }
+    delay(1500);
+    IR.resume();
   }
+ }
 }
