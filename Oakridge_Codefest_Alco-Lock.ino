@@ -6,9 +6,9 @@
 #define M2 8
 #define M3 9
 #define M4 11
-#define IR_L !digitalRead(10)
+#define IR_R !digitalRead(10)
 #define IR_M !digitalRead(4)
-#define IR_R !digitalRead(2)
+#define IR_L !digitalRead(2)
 int Echo = A4;  
 int Trig = A5; 
 int middleDistance = 0;
@@ -28,8 +28,17 @@ void setup() {
  pinMode(ENB,OUTPUT);
  Serial.begin(9600);
 }
-
-void foward(){
+int Distance_test() {
+  digitalWrite(Trig, LOW);   
+  delayMicroseconds(2);
+  digitalWrite(Trig, HIGH);  
+  delayMicroseconds(2);
+  digitalWrite(Trig, LOW);   
+  float Fdistance = pulseIn(Echo, HIGH);  
+  Fdistance= Fdistance / 58;       
+  return (int)Fdistance;
+}
+void foward(){//function for going forwards
  Serial.println("foward");
  analogWrite(ENA,carspeed);
  analogWrite(ENB,carspeed);
@@ -38,7 +47,7 @@ void foward(){
  digitalWrite(M3,LOW);
  digitalWrite(M4,HIGH);
 }
-void back(){
+void back(){//function for going backwards
  Serial.println("back");
  analogWrite(ENA,carspeed);
  analogWrite(ENB,carspeed);
@@ -47,7 +56,7 @@ void back(){
  digitalWrite(M3,HIGH);
  digitalWrite(M4,LOW);
 }
-void left(){
+void left(){//function for going left
  Serial.println("foward");
  analogWrite(ENA,turningcarspeed);
  analogWrite(ENB,turningcarspeed);
@@ -56,7 +65,7 @@ void left(){
  digitalWrite(M3,HIGH);
  digitalWrite(M4,LOW);
 }
-void right(){
+void right(){//function for going right
  Serial.println("back");
  analogWrite(ENA,turningcarspeed);
  analogWrite(ENB,turningcarspeed);
@@ -65,17 +74,17 @@ void right(){
  digitalWrite(M3,LOW);
  digitalWrite(M4,HIGH);
 }
-void stop(){
+void stop(){//function for stopping 
   digitalWrite(ENA,LOW);
   digitalWrite(ENB,LOW);
   Serial.println("Stop");
 }
 void loop() {
   // put your main code here, to run repeatedly:
- int pol=analogRead(A0);
+ int pol=analogRead(A0);//pollutuion sensor
  Serial.println(pol);
-if (pol>=275){
-  if(IR_M==LOW){
+ if (pol>=275){
+  if(IR_M==LOW){ //IR Sensor following line 
     foward();
   }
   else if (IR_R==LOW){
@@ -86,6 +95,12 @@ if (pol>=275){
     left();
     while(IR_L);
   }
+  if (Distance_test<=40){
+    foward();
   
+  }
+  else{
+    stop();
+  }
 }
- }
+ 
