@@ -11,6 +11,8 @@
 
 void setup() {
   // put your setup code here, to run once:
+ pinMode(A4,OUTPUT);
+ pinMode(A5,INPUT);
  pinMode(10,INPUT);
  pinMode(4,INPUT);
  pinMode(2,INPUT);
