@@ -2,6 +2,7 @@
 IRrecv IR(3);
 #define carspeed 100 // speed for moving forward/back
 #define turningcarspeed 150 // speed for moving left/right 
+#define stopcarspeed 0
 #define ENA 5
 #define ENB 6
 #define M1 7
@@ -30,15 +31,7 @@ void setup() {
  pinMode(ENB,OUTPUT);
  Serial.begin(9600);
 }
-int Distance_test() {
-  digitalWrite(Trig, LOW);   
-  delayMicroseconds(5);
-  digitalWrite(Trig, HIGH);  
-  delayMicroseconds(10);
-  digitalWrite(Trig, LOW);   
-  duration = pulseIn(Echo, HIGH);  
-  inches = (duration/2) / 74; 
-}
+
 void foward(){//function for going forwards
  Serial.println("foward");
  analogWrite(ENA,carspeed);
@@ -80,47 +73,35 @@ void right(){//function for going right
  
 }
 void stop(){//function for stopping 
-  digitalWrite(ENA,LOW);
-  digitalWrite(ENB,LOW);
+  digitalWrite(ENA,stopcarspeed);
+  digitalWrite(ENB,stopcarspeed);
+  digitalWrite(M1,LOW);
+  digitalWrite(M2,LOW);
+  digitalWrite(M3,LOW);
+  digitalWrite(M4,LOW);
   Serial.println("Stop");
   
 }
 void loop() {
+  digitalWrite(Trig, LOW);   
+  delayMicroseconds(5);
+  digitalWrite(Trig, HIGH);  
+  delayMicroseconds(10);
+  digitalWrite(Trig, LOW);   
+  duration = pulseIn(Echo, HIGH);  
+  inches = (duration/2) / 74; 
+  Serial.print("inches ");
   Serial.println(inches);
-  Serial.println("inches");
-  delay(100);
+  delay(500);
 
  int pol=analogRead(A0);//pollutuion sensor
+ Serial.print("Pollution ");
  Serial.println(pol);
  delay(100);
- if (pol>=275){
-  if (Distance_test<=40){//Ultrasonic sensor detecting objects
+ if (pol>=275 && inches<=7){
     stop();
   }
-  else{
-    foward();
+ else {
+  foward();
   }
-  if(IR_M==HIGH){
-    foward();
-  }
-  else if(IR_R==LOW) { 
-    left();
-    while(IR_R);                             
-  }   
-  else if(IR_L==LOW) {
-    right();
-    while(IR_L);  
-  }
-  Serial.println((int)Distance_test);
-  if (Distance_test<=70){//Ultrasonic sensor detecting objects
-    stop();
-  }
-  else{
-    foward();
-  }
-  }
-
-  
-
 }
- 
