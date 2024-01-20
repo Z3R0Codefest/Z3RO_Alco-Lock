@@ -1,7 +1,7 @@
 #include <IRremote.h>
 IRrecv IR(12);
-#define carspeed 125 // speed for moving forward/back
-#define turningcarspeed 150 // speed for moving left/right 
+#define carspeed 80 // speed for moving forward/back
+#define turningcarspeed 200// speed for moving left/right 
 #define stopcarspeed 0
 #define ENA 5
 #define ENB 6
@@ -117,23 +117,32 @@ void loop() {
  Serial. println(pol);
  delay(100);
  if (pol>=275){
-    if(inches<=7){
+    if(inches<=10){
       stop();
     }
     else{
       foward();
+      if(IR_M==HIGH && IR_L==HIGH && IR_R==HIGH){
+      foward();
+      }
+      else if(IR_M==HIGH && IR_L==LOW && IR_R==HIGH || IR_M==LOW && IR_L==LOW && IR_R==HIGH) { 
+        while(IR_R==HIGH && IR_M==HIGH || IR_R==HIGH){
+          stop();
+          delay(500);
+          stpright();
+          delay(500);
+        }
+      }
+      else if(IR_M==HIGH && IR_L==HIGH && IR_R==LOW || IR_M==LOW && IR_L==HIGH && IR_R==LOW) {
+        while(IR_L == HIGH && IR_M == HIGH || IR_L==HIGH){
+          stop();
+          delay(500);
+          stpleft();
+          delay(500);
+        }
     }
-    if(IR_M){
-    foward();
     }
-    else if(IR_R) { 
-    stpright();
-    while(IR_R);
-    }
-    else if(IR_L) {
-    stpleft();
-    while(IR_L);
-    }
+    
 }
 
   
@@ -154,11 +163,11 @@ void loop() {
     }
     if(IR.decodedIRData.decodedRawData == 0xF50AFD02){
       stpleft();
-      delay(50);
+      delay(500);
     }
     if(IR.decodedIRData.decodedRawData == 0xB54AFD02){
       stpright();
-      delay(50);
+      delay(500);
     }
     delay(1500);
     IR.resume();
