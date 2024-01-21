@@ -1,6 +1,6 @@
 #include <IRremote.h>
 IRrecv IR(12);
-#define carspeed 150 // speed for moving forward/back
+#define carspeed 100 // speed for moving forward/back
 #define turningcarspeed 150// speed for moving left/right 
 #define stopcarspeed 0
 #define ENA 5
@@ -115,16 +115,18 @@ void loop() {
       stop();
     }
     else{
-      foward();
-      if (IR_M){
+      if(IR_M){
         foward();
-    }
-      else if(IR_L) { 
-        left();                             
-    }   
-      else if(IR_R) {
+      }
+      else if(IR_R) { 
         right();
-    }
+      }
+  
+      else if(IR_L) {
+        left();
+
+      }
+      
     }
 
   
