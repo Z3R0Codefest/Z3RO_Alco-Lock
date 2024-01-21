@@ -1,7 +1,7 @@
 #include <IRremote.h>
 IRrecv IR(12);
-#define carspeed 80 // speed for moving forward/back
-#define turningcarspeed 200// speed for moving left/right 
+#define carspeed 150 // speed for moving forward/back
+#define turningcarspeed 150// speed for moving left/right 
 #define stopcarspeed 0
 #define ENA 5
 #define ENB 6
@@ -23,24 +23,18 @@ void setup() {
  pinMode(10,INPUT);//IR sensor right
  pinMode(4,INPUT);//IR sensor middle
  pinMode(2,INPUT);//IR sensor left
- pinMode(M1,OUTPUT);
- pinMode(M2,OUTPUT);
- pinMode(M3,OUTPUT);
- pinMode(M4,OUTPUT);
- pinMode(ENA,OUTPUT);
- pinMode(ENB,OUTPUT);
  Serial.begin(9600);
 }
 
 void foward(){//function for going forwards
- Serial.println("foward");
+ Serial.println("forward");
  analogWrite(ENA,carspeed);
  analogWrite(ENB,carspeed);
  digitalWrite(M1,HIGH);
  digitalWrite(M2,LOW);
  digitalWrite(M3,LOW);
  digitalWrite(M4,HIGH);
- delay(400);
+
 }
 void back(){//function for going backwards
  Serial.println("back");
@@ -50,7 +44,7 @@ void back(){//function for going backwards
  digitalWrite(M2,HIGH);
  digitalWrite(M3,HIGH);
  digitalWrite(M4,LOW);
- delay(200);
+ 
 }
 void left(){//function for going left
  Serial.println("left");
@@ -117,60 +111,56 @@ void loop() {
  Serial. println(pol);
  delay(100);
  if (pol>=275){
-    if(inches<=10){
+    if(inches<=7){
       stop();
     }
     else{
       foward();
-      if(IR_M==HIGH && IR_L==HIGH && IR_R==HIGH){
-      foward();
-      }
-      else if(IR_M==HIGH && IR_L==LOW && IR_R==HIGH || IR_M==LOW && IR_L==LOW && IR_R==HIGH) { 
-        while(IR_R==HIGH && IR_M==HIGH || IR_R==HIGH){
-          stop();
-          delay(500);
-          stpright();
-          delay(500);
-        }
-      }
-      else if(IR_M==HIGH && IR_L==HIGH && IR_R==LOW || IR_M==LOW && IR_L==HIGH && IR_R==LOW) {
-        while(IR_L == HIGH && IR_M == HIGH || IR_L==HIGH){
-          stop();
-          delay(500);
-          stpleft();
-          delay(500);
-        }
+      if (IR_M){
+        foward();
+    }
+      else if(IR_L) { 
+        left();                             
+    }   
+      else if(IR_R) {
+        right();
     }
     }
-    
-}
 
   
- else if (pol<275){
-  if (IR.decode()){
-    Serial.println(IR.decodedIRData.decodedRawData, HEX);
-    if(IR.decodedIRData.decodedRawData == 0xB649FD02){
-      stop();
-      delay(50);
+  
+    
+    
+  
+  }
+                            
+  
+
+  else if (pol<275){
+    if (IR.decode()){
+      Serial.println(IR.decodedIRData.decodedRawData, HEX);
+      if(IR.decodedIRData.decodedRawData == 0xB649FD02){
+        stop();
+        delay(50);
+      }
+      if(IR.decodedIRData.decodedRawData == 0xA25DFD02){
+       foward();
+       delay(50);
+      }
+      if(IR.decodedIRData.decodedRawData==0xA659FD02){
+        back();
+        delay(50);
+      }
+      if(IR.decodedIRData.decodedRawData == 0xF50AFD02){
+        stpleft();
+        delay(50);
+      }
+      if(IR.decodedIRData.decodedRawData == 0xB54AFD02){
+        stpright();
+        delay(50);
+      }
+      delay(200);
+      IR.resume();
     }
-    if(IR.decodedIRData.decodedRawData == 0xA25DFD02){
-      foward();
-      delay(50);
-    }
-    if(IR.decodedIRData.decodedRawData==0xA659FD02){
-      back();
-      delay(50);
-    }
-    if(IR.decodedIRData.decodedRawData == 0xF50AFD02){
-      stpleft();
-      delay(500);
-    }
-    if(IR.decodedIRData.decodedRawData == 0xB54AFD02){
-      stpright();
-      delay(500);
-    }
-    delay(1500);
-    IR.resume();
   }
  }
-}
